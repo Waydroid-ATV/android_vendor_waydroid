@@ -2,9 +2,9 @@
 <manifest>
 
   <!-- WayDroid -->
-  <project path="device/waydroid/waydroid" name="WayDroid/android_device_waydroid_waydroid" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="device/waydroid/waydroid" name="Waydroid-ATV/android_device_waydroid_waydroid" remote="ghub" revision="refs/heads/lineage-18.1" />
   <project path="hardware/waydroid" name="WayDroid/android_hardware_waydroid" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="vendor/extra" name="WayDroid/android_vendor_waydroid" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="vendor/extra" name="Waydroid-ATV/android_vendor_waydroid" remote="ghub" revision="refs/heads/lineage-18.1" />
   <project path="packages/apps/WaydroidUpdater" name="WayDroid/android_packages_apps_WaydroidUpdater" remote="ghub" revision="refs/heads/lineage-18.1" />
 
   <!-- Audio -->
@@ -14,15 +14,18 @@
   <project path="external/pulseaudio" name="WayDroid/android_external_pulseaudio" remote="ghub" revision="refs/heads/lineage-17.1" />
 
   <!-- Display -->
-  <project path="external/mesa" name="WayDroid/android_external_mesa3d" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="external/libdrm" name="WayDroid/android_external_libdrm" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="external/mesa" name="Waydroid-ATV/android_external_mesa3d" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="external/libdrm" name="Waydroid-ATV/android_external_libdrm" remote="ghub" revision="refs/heads/lineage-18.1" />
   <project path="external/llvm-project" name="WayDroid/android_external_llvm-project" remote="ghub" revision="refs/heads/lineage-18.1"/>
   <project path="external/minigbm" name="WayDroid/android_external_minigbm" remote="ghub" revision="refs/heads/lineage-18.1"/>
 
   <!-- Media -->
-  <project path="external/ffmpeg" name="WayDroid/android_external_ffmpeg" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="external/stagefright-plugins" name="WayDroid/android_external_stagefright-plugins" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="hardware/intel/common/libva" name="WayDroid/android_hardware_intel_common_libva" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="external/ffmpeg" name="Waydroid-ATV/android_external_ffmpeg" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="external/stagefright-plugins" name="Waydroid-ATV/android_external_stagefright-plugins" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="hardware/intel/common/libva" name="Waydroid-ATV/android_hardware_intel_common_libva" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="hardware/intel/common/vaapi" name="android-generic/platform_hardware_intel_common_vaapi" remote="ghub" revision="refs/heads/11-x86" />
+  <project path="hardware/intel/common/media-driver" name="android-generic/hardware_intel_common_media-driver" remote="ghub" revision="refs/heads/23.2" />
+  <project path="hardware/intel/common/gmmlib" name="android-generic/hardware_intel_common_gmmlib" remote="ghub" revision="refs/heads/latest" />
 
   <!-- BoringDroid -->
   <project path="vendor/prebuilts/bdapps" name="boringdroid/vendor_prebuilts_bdapps" remote="ghub" revision="refs/heads/boringdroid-11.0.0" />
