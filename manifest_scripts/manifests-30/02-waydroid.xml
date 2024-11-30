@@ -15,23 +15,26 @@
 
   <!-- Display -->
   <project path="external/mesa" name="Waydroid-ATV/android_external_mesa3d" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="external/libdrm" name="Waydroid-ATV/android_external_libdrm" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="external/llvm-project" name="WayDroid/android_external_llvm-project" remote="ghub" revision="refs/heads/lineage-18.1"/>
+  <project path="external/libdrm" name="WayDroid/android_external_libdrm" remote="ghub" revision="refs/heads/lineage-18.1" />
   <project path="external/minigbm" name="WayDroid/android_external_minigbm" remote="ghub" revision="refs/heads/lineage-18.1"/>
+  <project path="external/llvm-project" name="WayDroid/android_external_llvm-project" remote="ghub" revision="refs/heads/lineage-18.1"/>
 
   <!-- Media -->
-  <project path="external/ffmpeg" name="Waydroid-ATV/android_external_ffmpeg" remote="ghub" revision="refs/heads/lineage-18.1" />
+  <project path="external/ffmpeg" name="Waydroid-ATV/android_external_ffmpeg" remote="ghub" revision="refs/heads/release/7.0-11" />
   <project path="external/stagefright-plugins" name="Waydroid-ATV/android_external_stagefright-plugins" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="hardware/intel/common/libva" name="Waydroid-ATV/android_hardware_intel_common_libva" remote="ghub" revision="refs/heads/lineage-18.1" />
-  <project path="hardware/intel/common/vaapi" name="android-generic/platform_hardware_intel_common_vaapi" remote="ghub" revision="refs/heads/11-x86" />
-  <project path="hardware/intel/common/media-driver" name="android-generic/hardware_intel_common_media-driver" remote="ghub" revision="refs/heads/24.3" />
-  <project path="hardware/intel/common/gmmlib" name="android-generic/hardware_intel_common_gmmlib" remote="ghub" revision="refs/heads/latest" />
+
+  <!-- VA-API -->
+  <project path="external/libva-utils" name="android-generic/external_libva-utils" remote="ghub" revision="refs/heads/14-x86" />
+  <project path="hardware/intel/common/libva" name="Waydroid-ATV/hardware_intel_common_libva" remote="ghub" revision="refs/heads/14-x86" />
+  <project path="hardware/intel/common/vaapi" name="Waydroid-ATV/platform_hardware_intel_common_vaapi" remote="ghub" revision="refs/heads/14-x86" />
+  <project path="hardware/intel/common/media-driver" name="Waydroid-ATV/hardware_intel_common_media-driver" remote="ghub" revision="refs/heads/24.3" />
+  <project path="hardware/intel/common/gmmlib" name="Waydroid-ATV/hardware_intel_common_gmmlib" remote="ghub" revision="refs/heads/latest" />
 
   <!-- BoringDroid -->
   <project path="vendor/prebuilts/bdapps" name="boringdroid/vendor_prebuilts_bdapps" remote="ghub" revision="refs/heads/boringdroid-11.0.0" />
 
   <!-- Build -->
-  <project path="prebuilts/intel-clc" name="WayDroid/android_prebuilts_intel-clc" groups="pdk" clone-depth="1" remote="ghub" revision="refs/heads/main" />
+  <project path="prebuilts/intel-clc" name="Waydroid-ATV/android_prebuilts_intel-clc" groups="pdk" clone-depth="1" remote="ghub" revision="refs/heads/main" />
 
   <!-- VNDK -->
   <project path="prebuilts/vndk/v29" name="WayDroid/android_prebuilts_vndk_v29" groups="pdk" clone-depth="1" remote="ghub" revision="refs/heads/lineage-18.1" />
