@@ -1,0 +1,34 @@
+From f85bb9742f21d27b323ca3b8b360fe7bbe134398 Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sun, 18 Jan 2026 20:21:35 +0800
+Subject: [PATCH 14/17] Ignore cgroup error
+
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ core/jni/com_android_internal_os_Zygote.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/core/jni/com_android_internal_os_Zygote.cpp b/core/jni/com_android_internal_os_Zygote.cpp
+index 9653307abf25..ba3a335d0d11 100644
+--- a/core/jni/com_android_internal_os_Zygote.cpp
++++ b/core/jni/com_android_internal_os_Zygote.cpp
+@@ -1984,13 +1984,15 @@ static void SpecializeCommon(JNIEnv* env, uid_t uid, gid_t gid, jintArray gids,
+     // If this zygote isn't root, it won't be able to create a process group,
+     // since the directory is owned by root.
+     if (getuid() == 0) {
+-        const int rc = createProcessGroup(uid, getpid());
++        createProcessGroup(uid, getpid());
++#if 0
+         if (rc != 0) {
+             fail_fn(rc == -EROFS ? CREATE_ERROR("createProcessGroup failed, kernel missing "
+                                                 "CONFIG_CGROUP_CPUACCT?")
+                                  : CREATE_ERROR("createProcessGroup(%d, %d) failed: %s", uid,
+                                                 /* pid= */ 0, strerror(-rc)));
+         }
++#endif
+ 
+         if (is_system_server) {
+             // Not all devices mount memcgv1 so check if it is mounted first
+-- 
+2.55.0
+

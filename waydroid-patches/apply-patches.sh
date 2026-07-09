@@ -137,7 +137,7 @@ apply_patch() {
   fi
 }
 
-sdkv=36
+sdkv=37
 patch_dir="${patch_dir}-${sdkv}"
 roms_patch_dir="${roms_patch_dir}-${sdkv}"
 

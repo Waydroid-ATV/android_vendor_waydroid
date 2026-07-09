@@ -1,0 +1,104 @@
+From d28385d4bbaa5f5d554f62cdee7030946f827bb0 Mon Sep 17 00:00:00 2001
+From: Alessandro Astone <ales.astone@gmail.com>
+Date: Tue, 29 Aug 2023 20:36:56 +0200
+Subject: [PATCH 12/17] Send idle-inhibit status to the waydroid hwcomposer
+
+Change-Id: Ib95ff6578c873ebe8926a4b18507742f0f8f6799
+---
+ services/core/Android.bp                      |  1 +
+ .../com/android/server/wm/DisplayContent.java | 32 +++++++++++++++++--
+ 2 files changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/services/core/Android.bp b/services/core/Android.bp
+index 7ce5d205b891..e0d9728b161c 100644
+--- a/services/core/Android.bp
++++ b/services/core/Android.bp
+@@ -274,6 +274,7 @@ java_library_static {
+         "android.content.flags-aconfig-java",
+         "trust_token",
+         "ambientcontext_flags_lib",
++        "vendor.waydroid.window-V1.2-java",
+     ],
+     javac_shard_size: 50,
+     javacflags: [
+diff --git a/services/core/java/com/android/server/wm/DisplayContent.java b/services/core/java/com/android/server/wm/DisplayContent.java
+index c55085d3e416..6bf684c17d33 100644
+--- a/services/core/java/com/android/server/wm/DisplayContent.java
++++ b/services/core/java/com/android/server/wm/DisplayContent.java
+@@ -279,6 +279,8 @@ import com.android.server.wm.utils.RotationCache;
+ import com.android.server.wm.utils.WmDisplayCutout;
+ import com.android.window.flags.Flags;
+ 
++import vendor.waydroid.window.V1_2.IWaydroidWindow;
++
+ import java.io.PrintWriter;
+ import java.lang.annotation.Retention;
+ import java.lang.annotation.RetentionPolicy;
+@@ -287,6 +289,7 @@ import java.util.HashMap;
+ import java.util.Iterator;
+ import java.util.LinkedList;
+ import java.util.List;
++import java.util.NoSuchElementException;
+ import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.Consumer;
+@@ -1132,6 +1135,9 @@ class DisplayContent extends RootDisplayArea implements WindowManagerPolicy.Disp
+             w -> getDisplayPolicy().applyPostLayoutPolicyLw(w, w.mAttrs, w.getParentWindow(),
+                     mImeLayeringTarget);
+ 
++    final HashMap<String, Boolean> mIdleInhibitMap = new HashMap<>();
++    private IWaydroidWindow mWaydroidWindow;
++
+     private final Consumer<WindowState> mApplySurfaceChangesTransaction = w -> {
+         if (w.mHasSurface) {
+             // Take care of the window being ready to display.
+@@ -1161,7 +1167,17 @@ class DisplayContent extends RootDisplayArea implements WindowManagerPolicy.Disp
+             }
+ 
+             if (w.mHasSurface && isDisplayed) {
+-                if ((w.mAttrs.flags & FLAG_KEEP_SCREEN_ON) != 0) {
++                final boolean hold = (w.mAttrs.flags & FLAG_KEEP_SCREEN_ON) != 0;
++                if (mWaydroidWindow != null && w.getTask() != null) {
++                    String id = w.getOwningUid() + "#" + w.getTask().mTaskId;
++                    if (mIdleInhibitMap.getOrDefault(id, false) != hold) {
++                        mIdleInhibitMap.put(id, hold);
++                        try {
++                            mWaydroidWindow.setIdleInhibit(Integer.toString(w.getTask().mTaskId), hold);
++                        } catch (RemoteException ignored) {}
++                    }
++                }
++                if (hold) {
+                     mTmpHoldScreenWindow = w;
+                 } else if (w == mLastWakeLockHoldingWindow) {
+                     ProtoLog.d(WM_DEBUG_KEEP_SCREEN_ON,
+@@ -1377,7 +1393,11 @@ class DisplayContent extends RootDisplayArea implements WindowManagerPolicy.Disp
+                 R.bool.config_defaultInTouchMode);
+         mWmService.mInputManager.setInTouchMode(mInTouchMode, mWmService.MY_PID, mWmService.MY_UID,
+                 /* hasPermission= */ true, mDisplayId);
+-    }
++
++        try {
++            mWaydroidWindow = IWaydroidWindow.getService(false /* retry */);
++        } catch (NoSuchElementException | RemoteException ignored) {}
++}
+ 
+     private void beginHoldScreenUpdate() {
+         mTmpHoldScreenWindow = null;
+@@ -1386,6 +1406,14 @@ class DisplayContent extends RootDisplayArea implements WindowManagerPolicy.Disp
+ 
+     private void finishHoldScreenUpdate() {
+         final boolean hold = mTmpHoldScreenWindow != null;
++
++        if (mWaydroidWindow != null && !hold && mIdleInhibitMap.values().contains(true)) {
++            mIdleInhibitMap.clear();
++            try {
++                mWaydroidWindow.setIdleInhibit("*", false);
++            } catch (RemoteException ignored) {}
++        }
++
+         if (hold && mTmpHoldScreenWindow != mHoldScreenWindow) {
+             mHoldScreenWakeLock.setWorkSource(new WorkSource(mTmpHoldScreenWindow.mSession.mUid,
+                     mTmpHoldScreenWindow.mSession.mPackageName));
+-- 
+2.55.0
+

@@ -1,0 +1,100 @@
+From 13a2b0228e0415842766ae5e99c35a78c09eb0df Mon Sep 17 00:00:00 2001
+From: Erfan Abdi <erfangplus@gmail.com>
+Date: Sat, 22 Aug 2026 16:11:04 +0000
+Subject: [PATCH 17/17] base: Include waydroid framework
+
+Co-authored-by: SupeChicken666 <me@supechicken666.dev>
+Change-Id: I98296e805f0f9eb542ecbdaf2b97439e2e43ea7d
+---
+ core/res/Android.bp                                | 3 ++-
+ packages/SystemUI/Android.bp                       | 1 +
+ services/Android.bp                                | 2 ++
+ services/core/Android.bp                           | 1 +
+ services/java/com/android/server/SystemServer.java | 6 ++++++
+ 5 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/core/res/Android.bp b/core/res/Android.bp
+index 438c50aef763..4f02fd3e663b 100644
+--- a/core/res/Android.bp
++++ b/core/res/Android.bp
+@@ -140,7 +140,8 @@ android_app {
+     ],
+ 
+     resource_zips: [
+-        ":remote-color-resources-arsc-zip",
++       ":remote-color-resources-arsc-zip",
++       ":framework-waydroid-res", 
+     ],
+ 
+     // Create package-export.apk, which other packages can use to get
+diff --git a/packages/SystemUI/Android.bp b/packages/SystemUI/Android.bp
+index 9382f88c38ef..109c8db9ed18 100644
+--- a/packages/SystemUI/Android.bp
++++ b/packages/SystemUI/Android.bp
+@@ -573,6 +573,7 @@ android_library {
+         "uilatencystats_flags_core_java_lib",
+         "personalcontext_ace_visualizer",
+         "vendor.lineage.powershare-V1-java",
++        "framework-waydroid.static",
+     ],
+     enable_ksp: true,
+     annotation_processor_flags: [
+diff --git a/services/Android.bp b/services/Android.bp
+index a34e4906f94b..b5be50335b50 100644
+--- a/services/Android.bp
++++ b/services/Android.bp
+@@ -159,6 +159,7 @@ filegroup {
+         ":services.voiceinteraction-sources",
+         ":services.wallpapereffectsgeneration-sources",
+         ":services.wifi-sources",
++        ":services.waydroid-sources",
+         ":framework-pm-common-shared-srcs",
+         ":framework-minus-apex-aconfig-srcjars",
+     ],
+@@ -360,6 +361,7 @@ java_library {
+         "services.usb",
+         "services.voiceinteraction",
+         "services.wallpapereffectsgeneration",
++        "services.waydroid",
+         "services.wifi",
+         "service-blobstore",
+         "service-jobscheduler",
+diff --git a/services/core/Android.bp b/services/core/Android.bp
+index e0d9728b161c..d24e6b5f9316 100644
+--- a/services/core/Android.bp
++++ b/services/core/Android.bp
+@@ -275,6 +275,7 @@ java_library_static {
+         "trust_token",
+         "ambientcontext_flags_lib",
+         "vendor.waydroid.window-V1.2-java",
++        "framework-waydroid.static",
+     ],
+     javac_shard_size: 50,
+     javacflags: [
+diff --git a/services/java/com/android/server/SystemServer.java b/services/java/com/android/server/SystemServer.java
+index 4bb406fc598d..b49e39ba4ab5 100644
+--- a/services/java/com/android/server/SystemServer.java
++++ b/services/java/com/android/server/SystemServer.java
+@@ -347,6 +347,8 @@ import java.util.TreeSet;
+ import java.util.concurrent.CountDownLatch;
+ import java.util.concurrent.Future;
+ 
++import id.waydro.server.WaySystemServer;
++
+ /**
+  * Entry point to {@code system_server}.
+  */
+@@ -3168,6 +3170,10 @@ public final class SystemServer implements Dumpable {
+             reportWtf("Making " + externalServer + " ready", e);
+         }
+ 
++        t.traceBegin("startWaydroidServices");
++        WaySystemServer.startServices(context, mSystemServiceManager);
++        t.traceEnd();
++
+         // It is now time to start up the app processes...
+ 
+         t.traceBegin("MakeLockSettingsServiceReady");
+-- 
+2.55.0
+

@@ -1,0 +1,78 @@
+From 0b19097758e7cf997b3897509bac496dc5a14531 Mon Sep 17 00:00:00 2001
+From: jingjiezhuang <jingjie.zhuang@igg.com>
+Date: Mon, 11 May 2026 21:52:44 +0800
+Subject: [PATCH 06/17] clipboard: Talk with waydroid host service to get
+ clipboard synchronized
+
+Co-authored-by: SupeChicken666 <me@supechicken666.dev>
+Change-Id: I1d46306ada5967e27d568284e477eb0c88150016
+---
+ .../android/server/clipboard/ClipboardService.java  | 13 +++++++++++++
+ services/proguard.flags                             |  1 +
+ 2 files changed, 14 insertions(+)
+
+diff --git a/services/core/java/com/android/server/clipboard/ClipboardService.java b/services/core/java/com/android/server/clipboard/ClipboardService.java
+index 76f32f0b4061..8e73cd8aa18c 100644
+--- a/services/core/java/com/android/server/clipboard/ClipboardService.java
++++ b/services/core/java/com/android/server/clipboard/ClipboardService.java
+@@ -127,6 +127,8 @@ import java.util.List;
+ import java.util.concurrent.TimeUnit;
+ import java.util.function.Consumer;
+ 
++import id.waydro.waydroid.WaydroidClipboard;
++
+ /**
+  * Implementation of the clipboard for copy and paste.
+  * <p>
+@@ -181,6 +183,7 @@ public class ClipboardService extends SystemService {
+     private final IBinder mPermissionOwner;
+     private final Consumer<ClipData> mClipboardMonitor;
+     private final Handler mWorkerHandler;
++    private WaydroidClipboard mWaydroidClipboard;
+ 
+     @GuardedBy("mLock")
+     // Maps (userId, deviceId) to Clipboard.
+@@ -253,6 +256,7 @@ public class ClipboardService extends SystemService {
+         HandlerThread workerThread = new HandlerThread(TAG);
+         workerThread.start();
+         mWorkerHandler = workerThread.getThreadHandler();
++        mWaydroidClipboard = WaydroidClipboard.getInstance(context);
+     }
+ 
+     @Override
+@@ -948,6 +952,11 @@ public class ClipboardService extends SystemService {
+             clipboard = new Clipboard(userId, deviceId);
+             mClipboards.add(userId, deviceId, clipboard);
+         }
++        if (mWaydroidClipboard != null && mWaydroidClipboard.getService() != null) {
++            clipboard.primaryClip = new ClipData("host clipboard",
++                                                 new String[]{"text/plain"},
++                                                 new ClipData.Item(mWaydroidClipboard.getClipboardData()));
++        }
+         return clipboard;
+     }
+ 
+@@ -1085,6 +1094,10 @@ public class ClipboardService extends SystemService {
+             if (description != null) {
+                 description.setTimestamp(System.currentTimeMillis());
+             }
++            if (mWaydroidClipboard != null) {
++                ClipData.Item firstItem = clip.getItemAt(0);
++                mWaydroidClipboard.sendClipboardData(firstItem.getText().toString());
++            }
+         }
+         sendClipChangedBroadcast(clipboard);
+     }
+diff --git a/services/proguard.flags b/services/proguard.flags
+index cdb3a23b47c5..3218440b0bfc 100644
+--- a/services/proguard.flags
++++ b/services/proguard.flags
+@@ -150,4 +150,5 @@
+ -keep,allowoptimization,allowaccessmodification class vendor.lineage.** { *; }
+ 
+ # Waydroid
++-dontwarn vendor.waydroid.**
+ -keep class id.waydro.** { *; }
+-- 
+2.55.0
+

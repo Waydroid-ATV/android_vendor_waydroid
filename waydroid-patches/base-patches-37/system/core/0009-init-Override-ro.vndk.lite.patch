@@ -1,0 +1,29 @@
+From a723db39762c92f527fe78a8e0725cde912d6811 Mon Sep 17 00:00:00 2001
+From: Alessandro Astone <ales.astone@gmail.com>
+Date: Sat, 11 Feb 2023 17:43:59 +0100
+Subject: [PATCH 09/28] init: Override ro.vndk.lite
+
+The linkerconfig refuses to produce a configuration for ro.vndk.lite
+so clear it in case waydroid is still providing it
+
+Change-Id: I3b17805261e1e8da4bba3d01fbe8baae9d4d4b28
+---
+ init/property_service.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/init/property_service.cpp b/init/property_service.cpp
+index 421ff1e..6eb6a32 100644
+--- a/init/property_service.cpp
++++ b/init/property_service.cpp
+@@ -1438,6 +1438,8 @@ void PropertyInit() {
+         LOG(FATAL) << "Failed to load serialized property info file";
+     }
+ 
++    InitPropertySet("ro.vndk.lite", "");
++
+     // If arguments are passed both on the command line and in DT,
+     // properties set in DT always have priority over the command-line ones.
+     ProcessKernelDt();
+-- 
+2.55.0
+

@@ -1,0 +1,36 @@
+From 3b21697d2d483a7bedce10b8c465058e1eb55531 Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sun, 2 Aug 2026 04:56:44 +0000
+Subject: [PATCH 4/5] Add rust tools to PATH allowlist
+
+Change-Id: I5ac978d6fd9848f5266e18e5cfacb121d0eae4d1
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ ui/build/paths/config.go | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ui/build/paths/config.go b/ui/build/paths/config.go
+index 4af7d708c7..5ecb08b66a 100644
+--- a/ui/build/paths/config.go
++++ b/ui/build/paths/config.go
+@@ -87,6 +87,8 @@ func GetConfig(name string) PathConfig {
+ // run during the build. For more documentation, see path_interposer.go .
+ var Configuration = map[string]PathConfig{
+ 	"bash":        Allowed,
++	"bindgen":     Allowed,
++	"cbindgen":    Allowed,
+ 	"diff":        Allowed,
+ 	"dlv":         Allowed,
+ 	"expr":        Allowed,
+@@ -104,6 +106,8 @@ var Configuration = map[string]PathConfig{
+ 	"perl":        Log,
+ 	"pstree":      Allowed,
+ 	"rsync":       Allowed,
++	"rustc":       Allowed,
++	"rustfmt":     Allowed,
+ 	"sh":          Allowed,
+ 	"stubby":      Allowed,
+ 	"tr":          Allowed,
+-- 
+2.55.0
+

@@ -1,0 +1,36 @@
+From d744d8ae84da56dfae2ae898ffe2edf99754e29f Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sat, 16 May 2026 00:05:21 +0800
+Subject: [PATCH 16/17] DisplayModeDirector: Always use highest available
+ refresh rate
+
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ .../com/android/server/display/mode/DisplayModeDirector.java  | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/services/core/java/com/android/server/display/mode/DisplayModeDirector.java b/services/core/java/com/android/server/display/mode/DisplayModeDirector.java
+index c6927a6725ca..01c6dd291976 100644
+--- a/services/core/java/com/android/server/display/mode/DisplayModeDirector.java
++++ b/services/core/java/com/android/server/display/mode/DisplayModeDirector.java
+@@ -1239,7 +1239,7 @@ public class DisplayModeDirector {
+ 
+             float minRefreshRate = Settings.System.getFloatForUser(cr,
+                     Settings.System.MIN_REFRESH_RATE, 0f, UserHandle.USER_CURRENT);
+-            if (Float.isInfinite(minRefreshRate)) {
++            if (true /* Float.isInfinite(minRefreshRate) */) {
+                 // Infinity means that we want the highest possible refresh rate
+                 minRefreshRate = highestRefreshRate;
+             }
+@@ -1247,7 +1247,7 @@ public class DisplayModeDirector {
+             float peakRefreshRate = Settings.System.getFloatForUser(cr,
+                     Settings.System.PEAK_REFRESH_RATE, mDefaultPeakRefreshRate,
+                     UserHandle.USER_CURRENT);
+-            if (Float.isInfinite(peakRefreshRate)) {
++            if (true /* Float.isInfinite(peakRefreshRate) */) {
+                 // Infinity means that we want the highest possible refresh rate
+                 peakRefreshRate = highestRefreshRate;
+             }
+-- 
+2.55.0
+

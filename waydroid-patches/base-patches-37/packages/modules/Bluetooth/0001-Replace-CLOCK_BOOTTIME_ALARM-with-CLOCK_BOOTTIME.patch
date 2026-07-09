@@ -1,0 +1,71 @@
+From fd03281ba6b8a7a510b405dc74ac03081678929f Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sun, 23 Aug 2026 04:10:18 +0000
+Subject: [PATCH] Replace CLOCK_BOOTTIME_ALARM with CLOCK_BOOTTIME
+
+Waydroid should not interrupt the host from sleeping
+
+Change-Id: Ifc4bdecd87439203830ce9bb34a4fd208c014d3e
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ floss/rust/linux/mgmt/src/time.rs             | 2 +-
+ system/gd/os/linux_generic/alarm.cc           | 2 +-
+ system/gd/os/linux_generic/repeating_alarm.cc | 2 +-
+ system/osi/src/alarm.cc                       | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/floss/rust/linux/mgmt/src/time.rs b/floss/rust/linux/mgmt/src/time.rs
+index ec4c2e9..a15736e 100644
+--- a/floss/rust/linux/mgmt/src/time.rs
++++ b/floss/rust/linux/mgmt/src/time.rs
+@@ -45,7 +45,7 @@ impl Default for Alarm {
+ }
+ 
+ fn get_clock() -> ClockId {
+-    if cfg!(target_os = "android") {
++    if false {
+         ClockId::CLOCK_BOOTTIME_ALARM
+     } else {
+         ClockId::CLOCK_BOOTTIME
+diff --git a/system/gd/os/linux_generic/alarm.cc b/system/gd/os/linux_generic/alarm.cc
+index 02bf5af..de55a56 100644
+--- a/system/gd/os/linux_generic/alarm.cc
++++ b/system/gd/os/linux_generic/alarm.cc
+@@ -27,7 +27,7 @@
+ #include "os/linux_generic/linux.h"
+ #include "os/utils.h"
+ 
+-#ifdef __ANDROID__
++#if 0
+ #define ALARM_CLOCK CLOCK_BOOTTIME_ALARM
+ #else
+ #define ALARM_CLOCK CLOCK_BOOTTIME
+diff --git a/system/gd/os/linux_generic/repeating_alarm.cc b/system/gd/os/linux_generic/repeating_alarm.cc
+index 5f8ea95..99f46d2 100644
+--- a/system/gd/os/linux_generic/repeating_alarm.cc
++++ b/system/gd/os/linux_generic/repeating_alarm.cc
+@@ -27,7 +27,7 @@
+ #include "os/linux_generic/linux.h"
+ #include "os/utils.h"
+ 
+-#ifdef __ANDROID__
++#if 0
+ #define ALARM_CLOCK CLOCK_BOOTTIME_ALARM
+ #else
+ #define ALARM_CLOCK CLOCK_BOOTTIME
+diff --git a/system/osi/src/alarm.cc b/system/osi/src/alarm.cc
+index f3468af..26eca19 100644
+--- a/system/osi/src/alarm.cc
++++ b/system/osi/src/alarm.cc
+@@ -322,7 +322,7 @@ static bool lazy_initialize(void) {
+   // on those platforms, if we go to sleep with a timer armed, it will
+   // continue counting during sleep. to prevent unwanted timer fires on
+   // those platforms, use CLOCK_MONOTONIC and don't count up during sleep.
+-  bool wakeup_supported = android::sysprop::bluetooth::Hardware::wakeup_supported();
++  bool wakeup_supported = false;
+   clockid_t alarm_clockid = wakeup_supported ? CLOCK_BOOTTIME_ALARM : CLOCK_MONOTONIC;
+ 
+   std::lock_guard<std::mutex> lock(alarms_mutex);
+-- 
+2.55.0
+

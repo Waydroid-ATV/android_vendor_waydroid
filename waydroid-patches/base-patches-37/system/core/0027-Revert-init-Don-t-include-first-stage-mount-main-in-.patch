@@ -1,0 +1,51 @@
+From d786b274c47851ee22555c4a3e1011472a14e3eb Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sat, 11 Jul 2026 03:40:35 +0800
+Subject: [PATCH 27/28] Revert "init: Don't include first-stage mount/main in
+ second-stage init."
+
+This reverts commit 0ae463de7990a66d7dc591caacb4b943768d7c41.
+---
+ init/Android.bp | 4 +++-
+ init/main.cpp   | 4 ----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/init/Android.bp b/init/Android.bp
+index 0943afd..cd20764 100644
+--- a/init/Android.bp
++++ b/init/Android.bp
+@@ -71,6 +71,9 @@ init_device_sources = [
+     "devices.cpp",
+     "firmware_handler.cpp",
+     "first_stage_console.cpp",
++    "first_stage_init.cpp",
++    "first_stage_mount.cpp",
++    "first_stage_mount_android.cpp",
+     "fscrypt_init_extensions.cpp",
+     "init.cpp",
+     "lmkd_service.cpp",
+@@ -487,7 +490,6 @@ init_first_stage_cc_defaults {
+         "-DALLOW_FIRST_STAGE_CONSOLE=0",
+         "-DALLOW_LOCAL_PROP_OVERRIDE=0",
+         "-DALLOW_PERMISSIVE_SELINUX=0",
+-        "-DFIRST_STAGE_INIT=1",
+         "-DREBOOT_BOOTLOADER_ON_PANIC=0",
+         "-DWORLD_WRITABLE_KMSG=0",
+         "-DDUMP_ON_UMOUNT_FAILURE=0",
+diff --git a/init/main.cpp b/init/main.cpp
+index bb09f30..b01a3ee 100644
+--- a/init/main.cpp
++++ b/init/main.cpp
+@@ -79,9 +79,5 @@ int main(int argc, char** argv) {
+         }
+     }
+ 
+-#if defined(FIRST_STAGE_INIT) || defined(RECOVERY)
+     return FirstStageMain(argc, argv);
+-#else
+-    LOG(FATAL) << "Second-stage init requires an argument to main()";
+-#endif
+ }
+-- 
+2.55.0
+

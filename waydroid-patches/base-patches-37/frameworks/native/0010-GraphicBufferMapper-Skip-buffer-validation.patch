@@ -1,0 +1,46 @@
+From 6d1ef39f350d8ad57ddd71e6dc6e042171bd997a Mon Sep 17 00:00:00 2001
+From: Erfan Abdi <erfangplus@gmail.com>
+Date: Fri, 18 Jul 2025 13:44:18 +0000
+Subject: [PATCH 10/14] GraphicBufferMapper: Skip buffer validation
+
+Change-Id: Ia7580cec2e4c89f8de7768361ad9852374991fda
+---
+ libs/ui/GraphicBufferMapper.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/libs/ui/GraphicBufferMapper.cpp b/libs/ui/GraphicBufferMapper.cpp
+index 37a94bb..9440c18 100644
+--- a/libs/ui/GraphicBufferMapper.cpp
++++ b/libs/ui/GraphicBufferMapper.cpp
+@@ -108,9 +108,9 @@ void GraphicBufferMapper::dumpBufferToSystemLog(buffer_handle_t bufferHandle, bo
+     ALOGD("%s", s.c_str());
+ }
+ 
+-status_t GraphicBufferMapper::importBuffer(const native_handle_t* rawHandle, uint32_t width,
+-                                           uint32_t height, uint32_t layerCount, PixelFormat format,
+-                                           uint64_t usage, uint32_t stride,
++status_t GraphicBufferMapper::importBuffer(const native_handle_t* rawHandle, __attribute__ ((unused)) uint32_t width,
++                                           __attribute__ ((unused)) uint32_t height, __attribute__ ((unused)) uint32_t layerCount, __attribute__ ((unused)) PixelFormat format,
++                                           __attribute__ ((unused)) uint64_t usage, __attribute__ ((unused)) uint32_t stride,
+                                            buffer_handle_t* outHandle) {
+     ATRACE_CALL();
+ 
+@@ -121,13 +121,13 @@ status_t GraphicBufferMapper::importBuffer(const native_handle_t* rawHandle, uin
+         return error;
+     }
+ 
+-    error = mMapper->validateBufferSize(bufferHandle, width, height, format, layerCount, usage,
++    /*error = mMapper->validateBufferSize(bufferHandle, width, height, format, layerCount, usage,
+                                         stride);
+     if (error != NO_ERROR) {
+         ALOGE("validateBufferSize(%p) failed: %d", rawHandle, error);
+         freeBuffer(bufferHandle);
+         return static_cast<status_t>(error);
+-    }
++    }*/
+ 
+     *outHandle = bufferHandle;
+ 
+-- 
+2.55.0
+

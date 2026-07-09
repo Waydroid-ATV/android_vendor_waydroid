@@ -1,0 +1,115 @@
+From b2fad805e116400619ebef4d1cfbfe25ca57d74f Mon Sep 17 00:00:00 2001
+From: Erfan Abdi <erfangplus@gmail.com>
+Date: Sun, 12 Sep 2021 11:55:30 +0800
+Subject: [PATCH 05/17] Power: Add proper suspender
+
+Change-Id: I7bf3efc6ac97e4c106c3cc2815fbb773cda5d57e
+---
+ .../server/power/PowerManagerService.java     | 35 ++++++++++++++++---
+ services/proguard.flags                       |  3 ++
+ 2 files changed, 33 insertions(+), 5 deletions(-)
+
+diff --git a/services/core/java/com/android/server/power/PowerManagerService.java b/services/core/java/com/android/server/power/PowerManagerService.java
+index cac2b761fb9a..f2e179a0425e 100644
+--- a/services/core/java/com/android/server/power/PowerManagerService.java
++++ b/services/core/java/com/android/server/power/PowerManagerService.java
+@@ -118,6 +118,7 @@ import android.provider.Settings.SettingNotFoundException;
+ import android.service.dreams.DreamManagerInternal;
+ import android.sysprop.PowerProperties;
+ import android.telephony.TelephonyManager;
++import android.system.Os;
+ import android.util.ArrayMap;
+ import android.util.IntArray;
+ import android.util.KeyValueListParser;
+@@ -165,6 +166,7 @@ import com.android.server.power.feature.PowerManagerFlags;
+ import com.android.server.wm.WindowManagerInternal;
+ 
+ import dalvik.annotation.optimization.NeverCompile;
++import id.waydro.waydroid.Hardware;
+ 
+ import lineageos.providers.LineageSettings;
+ 
+@@ -181,6 +183,8 @@ import java.util.List;
+ import java.util.NoSuchElementException;
+ import java.util.Objects;
+ import java.util.concurrent.Executor;
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
+ 
+ /**
+  * The power manager service is responsible for coordinating power management
+@@ -366,6 +370,8 @@ public final class PowerManagerService extends SystemService
+     // True if battery saver is supported on this device.
+     private final boolean mBatterySaverSupported;
+ 
++    private Hardware mWaydroidHardware;
++    private boolean mWaydroidSuspendDefault;
+     private final PowerManagerFlags mFeatureFlags;
+ 
+     private boolean mDisableScreenWakeLocksWhileCached;
+@@ -1359,6 +1365,16 @@ public final class PowerManagerService extends SystemService
+         mKeyboardBrightnessDefault = mContext.getResources().getFloat(
+                 org.lineageos.platform.internal.R.dimen
+                         .config_keyboardBrightnessSettingDefaultFloat);
++        mWaydroidHardware = Hardware.getInstance(context);
++        try {
++            Matcher kernel_ver = Pattern.compile("(\\d+)\\.(\\d+)").matcher(Os.uname().release);
++            kernel_ver.find();
++            int kernel_maj = Integer.parseInt(kernel_ver.group(1));
++            int kernel_min = Integer.parseInt(kernel_ver.group(2));
++            mWaydroidSuspendDefault = kernel_maj > 4 || (kernel_maj == 4 && kernel_min >= 9);
++        } catch (Exception e) {
++            mWaydroidSuspendDefault = false;
++        }
+ 
+         // Save brightness values:
+         // Get float values from config.
+@@ -2438,10 +2454,10 @@ public final class PowerManagerService extends SystemService
+                     + ", flags=0x" + Integer.toHexString(flags) + ", uid=" + uid);
+         }
+ 
+-        if (eventTime < powerGroup.getLastSleepTimeLocked()
++        /*if (eventTime < powerGroup.getLastSleepTimeLocked()
+                 || eventTime < powerGroup.getLastWakeTimeLocked() || !mSystemReady) {
+             return false;
+-        }
++        }*/
+ 
+         Trace.traceBegin(Trace.TRACE_TAG_POWER, "userActivity");
+         try {
+@@ -3849,9 +3865,18 @@ public final class PowerManagerService extends SystemService
+                 changed = dreamPowerGroupLocked(powerGroup, time,
+                         Process.SYSTEM_UID, /* allowWake= */ false);
+             } else {
+-                changed = dozePowerGroupLocked(powerGroup, time,
+-                        PowerManager.GO_TO_SLEEP_REASON_TIMEOUT, Process.SYSTEM_UID,
+-                        /* allowSleepToDozeTransition */ false);
++                //changed = dozePowerGroupLocked(powerGroup, time,
++                //        PowerManager.GO_TO_SLEEP_REASON_TIMEOUT, Process.SYSTEM_UID,
++                //        /* allowSleepToDozeTransition */ false);
++                final boolean suspend = SystemProperties.getBoolean("persist.waydroid.suspend", mWaydroidSuspendDefault);
++                final boolean no_open_wins = SystemProperties.get("waydroid.open_windows", "-1").equals("0");
++                if (mWaydroidHardware != null && suspend && no_open_wins && ((dirty & DIRTY_WAKE_LOCKS) == 0)) {
++                    wakePowerGroupLocked(powerGroup, SystemClock.uptimeMillis(),
++                        PowerManager.WAKE_REASON_UNKNOWN,
++                        "android.server.power:DREAM_FINISHED", Process.SYSTEM_UID,
++                        mContext.getOpPackageName(), Process.SYSTEM_UID);
++                    mWaydroidHardware.suspend();
++                }
+             }
+         }
+         return changed;
+diff --git a/services/proguard.flags b/services/proguard.flags
+index 36d0f05f86ee..cdb3a23b47c5 100644
+--- a/services/proguard.flags
++++ b/services/proguard.flags
+@@ -148,3 +148,6 @@
+ -keep,allowoptimization,allowaccessmodification class lineageos.** { *; }
+ -keep,allowoptimization,allowaccessmodification class org.lineageos.** { *; }
+ -keep,allowoptimization,allowaccessmodification class vendor.lineage.** { *; }
++
++# Waydroid
++-keep class id.waydro.** { *; }
+-- 
+2.55.0
+

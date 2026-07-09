@@ -1,0 +1,77 @@
+From 4282646c0d0480fca23c5106fa9bc0036c69a1b9 Mon Sep 17 00:00:00 2001
+From: hmtheboy154 <buingoc67@gmail.com>
+Date: Mon, 30 Jun 2025 06:35:49 +0000
+Subject: [PATCH 23/29] codec2: Make RGBA/RGBX 8888 into usable formats
+
+Plane layout code is already in C2AllocatorGralloc so we can just
+use that. What we do now is to map these format to COLOR_FormatRGBAFlexible
+to make it work.
+
+Signed-off-by: hmtheboy154 <buingoc67@gmail.com>
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ media/codec2/sfplugin/CCodec.cpp             | 12 ++++++++++++
+ media/codec2/sfplugin/Codec2InfoBuilder.cpp  |  4 ++++
+ media/codec2/sfplugin/utils/Codec2Mapper.cpp |  1 +
+ 3 files changed, 17 insertions(+)
+
+diff --git a/media/codec2/sfplugin/CCodec.cpp b/media/codec2/sfplugin/CCodec.cpp
+index 292e9ab..64e3e13 100644
+--- a/media/codec2/sfplugin/CCodec.cpp
++++ b/media/codec2/sfplugin/CCodec.cpp
+@@ -1673,6 +1673,18 @@ void CCodec::configure(const sp<AMessage> &msg) {
+                                 format = flexPixelFormat[10];
+                             }
+                             break;
++                        case COLOR_Format32bitABGR8888:
++                            format = COLOR_Format32bitABGR8888;
++                            if (flexPixelFormat.count(8) != 0) {
++                                format = flexPixelFormat[8];
++                            }
++                            break;
++                        case COLOR_FormatRGBAFlexible:
++                            format = COLOR_FormatRGBAFlexible;
++                            if (flexPixelFormat.count(8) != 0) {
++                                format = flexPixelFormat[8];
++                            }
++                            break;
+                         default:
+                             // No-op
+                             break;
+diff --git a/media/codec2/sfplugin/Codec2InfoBuilder.cpp b/media/codec2/sfplugin/Codec2InfoBuilder.cpp
+index 0382721..9e74af7 100644
+--- a/media/codec2/sfplugin/Codec2InfoBuilder.cpp
++++ b/media/codec2/sfplugin/Codec2InfoBuilder.cpp
+@@ -312,6 +312,8 @@ void addSupportedColorFormats(
+         addDefaultColorFormat(COLOR_FormatYUV420SemiPlanar);
+         addDefaultColorFormat(COLOR_FormatYUV420PackedPlanar);
+         addDefaultColorFormat(COLOR_FormatYUV420PackedSemiPlanar);
++        addDefaultColorFormat(COLOR_Format32bitABGR8888);
++        addDefaultColorFormat(COLOR_FormatRGBAFlexible);
+         // Android video codecs prefer CPU-readable formats
+         if (trait.name.find("android") != std::string::npos) {
+             addDefaultColorFormat(COLOR_FormatSurface);
+@@ -756,6 +758,8 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
+                     pixelFormatMap[HAL_PIXEL_FORMAT_YCBCR_P010]    = COLOR_FormatYUVP010;
+                     pixelFormatMap[HAL_PIXEL_FORMAT_RGBA_1010102]  = COLOR_Format32bitABGR2101010;
+                     pixelFormatMap[HAL_PIXEL_FORMAT_RGBA_FP16]     = COLOR_Format64bitABGRFloat;
++                    pixelFormatMap[HAL_PIXEL_FORMAT_RGBA_8888]     = COLOR_Format32bitABGR8888;
++                    pixelFormatMap[HAL_PIXEL_FORMAT_RGBX_8888]     = COLOR_FormatRGBAFlexible;
+                     pixelFormatMap[AHARDWAREBUFFER_FORMAT_YCbCr_P210]    = COLOR_FormatYUVP210;
+ 
+                     std::shared_ptr<C2StoreFlexiblePixelFormatDescriptorsInfo> pixelFormatInfo;
+diff --git a/media/codec2/sfplugin/utils/Codec2Mapper.cpp b/media/codec2/sfplugin/utils/Codec2Mapper.cpp
+index f1477fd..fcb8ad6 100644
+--- a/media/codec2/sfplugin/utils/Codec2Mapper.cpp
++++ b/media/codec2/sfplugin/utils/Codec2Mapper.cpp
+@@ -615,6 +615,7 @@ ALookup<uint32_t, int32_t> sPixelFormats = {
+     { HAL_PIXEL_FORMAT_RGBA_1010102,           COLOR_Format32bitABGR2101010 },
+     { HAL_PIXEL_FORMAT_RGBA_FP16,              COLOR_Format64bitABGRFloat },
+     { HAL_PIXEL_FORMAT_RGBA_8888,              COLOR_Format32bitABGR8888 },
++    { HAL_PIXEL_FORMAT_RGBX_8888,              COLOR_FormatRGBAFlexible },
+ };
+ 
+ ALookup<C2Config::picture_type_t, int32_t> sPictureType = {
+-- 
+2.55.0
+

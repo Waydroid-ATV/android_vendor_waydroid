@@ -1,0 +1,33 @@
+From 115a4066805da250c1f39bb58e92e7e39b94d1cc Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sun, 1 Mar 2026 17:05:13 +0800
+Subject: [PATCH 19/28] ashmem: Bypass memfd check when EPERM
+
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ libcutils/ashmem-dev.cpp | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/libcutils/ashmem-dev.cpp b/libcutils/ashmem-dev.cpp
+index 655b8f5..906a047 100644
+--- a/libcutils/ashmem-dev.cpp
++++ b/libcutils/ashmem-dev.cpp
+@@ -198,8 +198,13 @@ static bool is_memfd_fd(int fd) {
+     std::string fd_path = android::base::StringPrintf("/proc/self/fd/%d", fd);
+     std::string result;
+     if (!android::base::Readlink(fd_path, &result)) {
+-        ALOGE("readlink(%s) failed: %m", fd_path.c_str());
+-        return false;
++        if (errno == EPERM) {
++            ALOGW("readlink(%s) failed: %m", fd_path.c_str());
++            return true;
++        } else {
++            ALOGE("readlink(%s) failed: %m", fd_path.c_str());
++            return false;
++        }
+     }
+     return result.starts_with("/memfd:");
+ }
+-- 
+2.55.0
+
