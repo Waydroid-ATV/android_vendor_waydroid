@@ -17,7 +17,7 @@
 top_dir=`pwd`
 LOCALDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 loc_man="${top_dir}/.repo/local_manifests"
-manifests_url="https://raw.githubusercontent.com/WayDroid-ATV/android_vendor_waydroid/lineage-23.2/manifest_scripts/manifests"
+manifests_url="https://raw.githubusercontent.com/WayDroid-ATV/android_vendor_waydroid/lineage-24.0/manifest_scripts/manifests"
 manifests_path="${LOCALDIR}/manifests"
 
 #setup colors
@@ -52,7 +52,7 @@ if [ ! -f build/make/core/version_util.mk ]; then
     exit
 fi
 
-sdkv="${WAYDROID_PATCH_SDK:-36}"
+sdkv="${WAYDROID_PATCH_SDK:-37}"
 manifests_url="${manifests_url}-${sdkv}"
 manifests_path="${manifests_path}-${sdkv}"
 

@@ -1,0 +1,28 @@
+From 3fdb2acca83041b26a60e6dea17b9d1c639b2bcd Mon Sep 17 00:00:00 2001
+From: SupeChicken666 <me@supechicken666.dev>
+Date: Sat, 30 May 2026 12:29:17 +0000
+Subject: [PATCH] lmkd: Do not fail when both vmpressure and psi monitors are
+ unavailable
+
+Change-Id: I4a067282d1d65625c5c5d3e82f421f060671aca6
+Signed-off-by: SupeChicken666 <me@supechicken666.dev>
+---
+ lmkd.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lmkd.cpp b/lmkd.cpp
+index 4bac215..5687da0 100644
+--- a/lmkd.cpp
++++ b/lmkd.cpp
+@@ -3652,7 +3652,7 @@ static bool init_monitors() {
+ 
+     if (!init_psi_monitors()) {
+         ALOGE("Failed to initialize PSI monitors");
+-        return false;
++        return true;
+     }
+ 
+     ALOGI("Using psi monitors for memory pressure detection");
+-- 
+2.55.0
+
